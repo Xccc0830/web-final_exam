@@ -1,26 +1,13 @@
 -- phpMyAdmin SQL Dump
-<<<<<<< HEAD
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2025-11-23 16:40:09
+-- 產生時間： 2025-11-23 17:16:45
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-=======
--- version 4.7.0
--- https://www.phpmyadmin.net/
---
--- 主機: 127.0.0.1
--- 產生時間： 
--- 伺服器版本: 10.1.22-MariaDB
--- PHP 版本： 7.1.4
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
->>>>>>> 4ad1be0b3b54f38a2f4e6772b64def42f5c0e594
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -37,7 +24,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
-<<<<<<< HEAD
 -- 資料表結構 `checkins`
 --
 
@@ -50,8 +36,6 @@ CREATE TABLE `checkins` (
 -- --------------------------------------------------------
 
 --
-=======
->>>>>>> 4ad1be0b3b54f38a2f4e6772b64def42f5c0e594
 -- 資料表結構 `residents`
 --
 
@@ -62,25 +46,18 @@ CREATE TABLE `residents` (
   `room` varchar(20) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
-<<<<<<< HEAD
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- 傾印資料表的資料 `residents`
-=======
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- 資料表的匯出資料 `residents`
->>>>>>> 4ad1be0b3b54f38a2f4e6772b64def42f5c0e594
 --
 
 INSERT INTO `residents` (`id`, `student_id`, `name`, `room`, `phone`, `email`, `created_at`) VALUES
 (1, '413401235', '許小策', '101', '0968635830', NULL, '2025-11-18 05:53:18'),
 (2, '413401508', '張底齊', '102', '091234567', NULL, '2025-11-18 06:07:30'),
-(3, '413401340', '沉思與', '103', '090000000', NULL, '2025-11-18 07:19:06');
+(3, '413401340', '沉思與', '103', '090000000', NULL, '2025-11-18 07:19:06'),
+(4, '413401234', '咪咪', '104', '0987654321', NULL, '2025-11-23 15:46:42');
 
 -- --------------------------------------------------------
 
@@ -93,19 +70,11 @@ CREATE TABLE `violations` (
   `resident_id` int(11) NOT NULL,
   `violation` varchar(255) NOT NULL,
   `points` int(11) NOT NULL,
-<<<<<<< HEAD
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- 傾印資料表的資料 `violations`
-=======
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- 資料表的匯出資料 `violations`
->>>>>>> 4ad1be0b3b54f38a2f4e6772b64def42f5c0e594
 --
 
 INSERT INTO `violations` (`id`, `resident_id`, `violation`, `points`, `created_at`) VALUES
@@ -115,7 +84,6 @@ INSERT INTO `violations` (`id`, `resident_id`, `violation`, `points`, `created_a
 (4, 2, '邊騎車邊抽菸引發大火', 999, '2025-11-18 07:00:27');
 
 --
-<<<<<<< HEAD
 -- 已傾印資料表的索引
 --
 
@@ -127,12 +95,6 @@ ALTER TABLE `checkins`
   ADD KEY `resident_id` (`resident_id`);
 
 --
-=======
--- 已匯出資料表的索引
---
-
---
->>>>>>> 4ad1be0b3b54f38a2f4e6772b64def42f5c0e594
 -- 資料表索引 `residents`
 --
 ALTER TABLE `residents`
@@ -146,7 +108,6 @@ ALTER TABLE `violations`
   ADD KEY `resident_id` (`resident_id`);
 
 --
-<<<<<<< HEAD
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
 --
 
@@ -154,13 +115,13 @@ ALTER TABLE `violations`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `checkins`
 --
 ALTER TABLE `checkins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `residents`
 --
 ALTER TABLE `residents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `violations`
@@ -180,27 +141,6 @@ ALTER TABLE `checkins`
 
 --
 -- 資料表的限制式 `violations`
-=======
--- 在匯出的資料表使用 AUTO_INCREMENT
---
-
---
--- 使用資料表 AUTO_INCREMENT `residents`
---
-ALTER TABLE `residents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
---
--- 使用資料表 AUTO_INCREMENT `violations`
---
-ALTER TABLE `violations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
---
--- 已匯出資料表的限制(Constraint)
---
-
---
--- 資料表的 Constraints `violations`
->>>>>>> 4ad1be0b3b54f38a2f4e6772b64def42f5c0e594
 --
 ALTER TABLE `violations`
   ADD CONSTRAINT `violations_ibfk_1` FOREIGN KEY (`resident_id`) REFERENCES `residents` (`id`) ON DELETE CASCADE;
