@@ -4,7 +4,7 @@ include("header.php");   // 頁首
 ?>
 
 <div class="container mt-4">
-    <h2>🏠 簽到管理（所有住民）</h2>
+    <h2>簽到管理（所有住民）</h2>
     <p>顯示所有住民的簽到紀錄。</p>
 
     <table class="table table-bordered table-striped">
@@ -48,7 +48,7 @@ include("header.php");   // 頁首
         </tbody>
     </table>
 
-    <a href="checkin_create.php" class="btn btn-success">＋ 新增簽到紀錄</a>
+    <a href="checkin_create.php" class="btn btn-success">新增簽到紀錄</a>
 </div>
 
 <?php

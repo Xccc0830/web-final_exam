@@ -3,7 +3,7 @@ include("db.php");   // 連線資料庫
 include("header.php"); // 頁首
 ?>
 
-<h2>⚠️ 違規管理（所有住民）</h2>
+<h2>違規管理（所有住民）</h2>
 <p>顯示所有住民的違規紀錄及總點數。</p>
 
 <table class="table table-bordered table-striped">
@@ -53,7 +53,6 @@ include("header.php"); // 頁首
     </tbody>
 </table>
 
-<!-- 新增違規紀錄 -->
 <a href="violation_create.php" class="btn btn-success">＋ 新增違規紀錄</a>
 
 <?php include("footer.php"); ?>

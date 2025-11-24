@@ -2,7 +2,6 @@
 include("db.php");
 include("header.php");
 
-// 取得所有住民資料，用於下拉選單
 $residents_result = $conn->query("SELECT id, name, student_id, room FROM residents ORDER BY name");
 
 // 新增簽到
@@ -26,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <div class="container mt-4">
-    <h2>＋ 新增簽到紀錄</h2>
+    <h2>新增簽到紀錄</h2>s
     <form method="POST">
         <div class="mb-3">
             <label for="resident_id" class="form-label">住民</label>

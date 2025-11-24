@@ -66,7 +66,7 @@
 
 <!-- 首頁封面內容 -->
 <div class="container mt-5">
-    <h1 class="mb-5 text-center">🏠 宿舍住民安全與紀律管理系統</h1>
+    <h1 class="mb-5 text-center">宿舍住民安全與紀律管理系統</h1>
 
     <div class="row g-4">
         <div class="col-md-4">
@@ -82,7 +82,6 @@
         <div class="col-md-4">
             <a href="violation_list_all.php" class="text-decoration-none text-dark">
                 <div class="feature-card border rounded shadow-sm">
-                    <span class="feature-icon">⚠️</span>
                     <h4 class="mt-3">違規記點管理</h4>
                     <p>新增違規 / 查看總點數</p>
                 </div>
@@ -92,7 +91,6 @@
         <div class="col-md-4">
             <a href="checkin_list_all.php" class="text-decoration-none text-dark">
                 <div class="feature-card border rounded shadow-sm">
-                    <span class="feature-icon">🏃‍♂️</span>
                     <h4 class="mt-3">住民簽到 / 門禁</h4>
                     <p>回報住民回宿舍時間</p>
                 </div>

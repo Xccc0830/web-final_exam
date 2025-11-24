@@ -18,7 +18,6 @@ $result = $conn->query($sql);
 <div class="container mt-4">
     <h2>住民資料列表</h2>
 
-    <!-- 搜尋表單 -->
     <form method="GET" class="mb-3">
         <div class="input-group">
             <input type="text" name="keyword" class="form-control" placeholder="搜尋學號 / 姓名 / 房號" value="<?= $keyword ?>">
@@ -26,7 +25,7 @@ $result = $conn->query($sql);
         </div>
     </form>
 
-    <a href="resident_create.php" class="btn btn-success mb-3">＋ 新增住民</a>
+    <a href="resident_create.php" class="btn btn-success mb-3">新增住民</a>
 
     <table class="table table-bordered table-striped">
         <thead>

@@ -4,19 +4,16 @@ include("db.php");
 
 $resident_id = $_GET['resident_id'] ?? 0;
 
-// 查住民資料
 $stmt = $conn->prepare("SELECT * FROM residents WHERE id=?");
 $stmt->bind_param("i", $resident_id);
 $stmt->execute();
 $resident = $stmt->get_result()->fetch_assoc();
 
-// 查簽到紀錄
 $stmt2 = $conn->prepare("SELECT * FROM checkins WHERE resident_id=? ORDER BY checkin_time DESC");
 $stmt2->bind_param("i", $resident_id);
 $stmt2->execute();
 $list = $stmt2->get_result();
 
-// 統計簽到次數
 $stmt3 = $conn->prepare("SELECT COUNT(*) AS total FROM checkins WHERE resident_id=?");
 $stmt3->bind_param("i", $resident_id);
 $stmt3->execute();
