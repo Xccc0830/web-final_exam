@@ -64,7 +64,6 @@
     </div>
 </nav>
 
-<!-- 首頁封面內容 -->
 <div class="container mt-5">
     <h1 class="mb-5 text-center">宿舍住民安全與紀律管理系統</h1>
 
@@ -72,7 +71,6 @@
         <div class="col-md-4">
             <a href="resident_list.php" class="text-decoration-none text-dark">
                 <div class="feature-card border rounded shadow-sm">
-                    <span class="feature-icon">👤</span>
                     <h4 class="mt-3">住民資料管理</h4>
                     <p>查詢 / 新增 / 編輯 / 刪除</p>
                 </div>
