@@ -24,11 +24,6 @@
             color: white !important;
         }
 
-        /* 封面大圖示 */
-        .feature-icon {
-            font-size: 4rem; /* 圖示大小 */
-            display: block;
-        }
         .feature-card {
             text-align: center;
             padding: 2rem;
