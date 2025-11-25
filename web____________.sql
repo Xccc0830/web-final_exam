@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 4.7.0
 -- https://www.phpmyadmin.net/
 --
--- 主機： 127.0.0.1
--- 產生時間： 2025-11-24 19:12:38
--- 伺服器版本： 10.4.32-MariaDB
--- PHP 版本： 8.2.12
+-- 主機: 127.0.0.1
+-- 產生時間： 
+-- 伺服器版本: 10.1.22-MariaDB
+-- PHP 版本： 7.1.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -30,11 +31,11 @@ SET time_zone = "+00:00";
 CREATE TABLE `checkins` (
   `id` int(11) NOT NULL,
   `resident_id` int(11) NOT NULL,
-  `checkin_time` timestamp NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `checkin_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- 傾印資料表的資料 `checkins`
+-- 資料表的匯出資料 `checkins`
 --
 
 INSERT INTO `checkins` (`id`, `resident_id`, `checkin_time`) VALUES
@@ -42,7 +43,12 @@ INSERT INTO `checkins` (`id`, `resident_id`, `checkin_time`) VALUES
 (4, 4, '2025-11-24 17:08:28'),
 (5, 2, '2025-11-24 17:08:34'),
 (6, 4, '2025-11-24 17:08:44'),
-(7, 5, '2025-11-24 17:19:15');
+(7, 5, '2025-11-24 17:19:15'),
+(8, 4, '2025-11-25 05:56:31'),
+(9, 6, '2025-11-25 06:06:00'),
+(10, 5, '2025-11-25 06:06:07'),
+(11, 3, '2025-11-25 06:06:11'),
+(12, 7, '2025-11-25 06:55:37');
 
 -- --------------------------------------------------------
 
@@ -57,11 +63,11 @@ CREATE TABLE `residents` (
   `room` varchar(20) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- 傾印資料表的資料 `residents`
+-- 資料表的匯出資料 `residents`
 --
 
 INSERT INTO `residents` (`id`, `student_id`, `name`, `room`, `phone`, `email`, `created_at`) VALUES
@@ -69,7 +75,10 @@ INSERT INTO `residents` (`id`, `student_id`, `name`, `room`, `phone`, `email`, `
 (2, '413401508', '張底齊', '102', '091234567', NULL, '2025-11-18 06:07:30'),
 (3, '413401340', '沉思與', '103', '090000000', NULL, '2025-11-18 07:19:06'),
 (4, '413401234', '咪咪', '104', '0987654321', NULL, '2025-11-23 15:46:42'),
-(5, '41344321', '林阿信', '105', '0931231653', NULL, '2025-11-24 17:16:51');
+(5, '41344321', '林阿信', '105', '0931231653', NULL, '2025-11-24 17:16:51'),
+(6, '413404564', '顏振宇', '201', '0987456197', NULL, '2025-11-25 06:03:53'),
+(7, '41340136', '王夏威', '202', '200000000000', NULL, '2025-11-25 06:54:33'),
+(8, '413401558', '其又伯夷', '203', '65464464448', NULL, '2025-11-25 07:04:49');
 
 -- --------------------------------------------------------
 
@@ -82,11 +91,11 @@ CREATE TABLE `violations` (
   `resident_id` int(11) NOT NULL,
   `violation` varchar(255) NOT NULL,
   `points` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- 傾印資料表的資料 `violations`
+-- 資料表的匯出資料 `violations`
 --
 
 INSERT INTO `violations` (`id`, `resident_id`, `violation`, `points`, `created_at`) VALUES
@@ -96,12 +105,22 @@ INSERT INTO `violations` (`id`, `resident_id`, `violation`, `points`, `created_a
 (4, 2, '邊騎車邊抽菸引發大火', 999, '2025-11-18 07:00:27'),
 (6, 2, '邊騎車邊抽菸彈菸蒂到警察車上引發大火', 999, '2025-11-24 17:11:06'),
 (7, 4, '打麻將隕石自摸把桌子打破，造成整棟宿舍的二樓變成一樓', 999, '2025-11-24 17:12:18'),
-(9, 1, '太帥', 4, '2025-11-24 17:18:12'),
 (10, 2, '邊騎車邊抽菸彈菸蒂到警察車上引發大火', 999, '2025-11-24 17:42:01'),
-(11, 4, 'test', 1, '2025-11-24 17:45:07');
+(13, 6, '押車壓太低', 999, '2025-11-25 06:04:46'),
+(14, 2, '跑去西昌街', 2147483647, '2025-11-25 06:51:54'),
+(15, 2, '喊著口號一張卡一個奇跡去拔插頭', 2147483647, '2025-11-25 06:52:39'),
+(16, 7, '叫他解正和弦他給我彈C大調', 2147483647, '2025-11-25 06:55:24'),
+(17, 7, '叫他去超商他說只想超市', 2147483647, '2025-11-25 06:56:37'),
+(18, 8, '整天說要回家其實跑去三仙巷', 2147483647, '2025-11-25 07:05:42'),
+(19, 8, '讓別人大噴水', 2147483647, '2025-11-25 07:07:19'),
+(20, 5, '騙我說要獵山豬其實去找猴子玩耍', 2147483647, '2025-11-25 07:08:24'),
+(22, 2, '妄想當職業牌手殊不知只是個職業搖手 多多慮好喝', 2147483647, '2025-11-25 07:11:32'),
+(23, 6, '假裝自己是直屬學長其實偷偷拐學妹真噁', 2147483647, '2025-11-25 07:16:25'),
+(24, 6, '報名下賽道結果開CHR過去', 2147483647, '2025-11-25 07:19:48'),
+(25, 8, '去夜店假裝很醉去得吃別人', 2147483647, '2025-11-25 07:20:41');
 
 --
--- 已傾印資料表的索引
+-- 已匯出資料表的索引
 --
 
 --
@@ -125,39 +144,36 @@ ALTER TABLE `violations`
   ADD KEY `resident_id` (`resident_id`);
 
 --
--- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
+-- 在匯出的資料表使用 AUTO_INCREMENT
 --
 
 --
--- 使用資料表自動遞增(AUTO_INCREMENT) `checkins`
+-- 使用資料表 AUTO_INCREMENT `checkins`
 --
 ALTER TABLE `checkins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
--- 使用資料表自動遞增(AUTO_INCREMENT) `residents`
+-- 使用資料表 AUTO_INCREMENT `residents`
 --
 ALTER TABLE `residents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 --
--- 使用資料表自動遞增(AUTO_INCREMENT) `violations`
+-- 使用資料表 AUTO_INCREMENT `violations`
 --
 ALTER TABLE `violations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+--
+-- 已匯出資料表的限制(Constraint)
+--
 
 --
--- 已傾印資料表的限制式
---
-
---
--- 資料表的限制式 `checkins`
+-- 資料表的 Constraints `checkins`
 --
 ALTER TABLE `checkins`
   ADD CONSTRAINT `checkins_ibfk_1` FOREIGN KEY (`resident_id`) REFERENCES `residents` (`id`) ON DELETE CASCADE;
 
 --
--- 資料表的限制式 `violations`
+-- 資料表的 Constraints `violations`
 --
 ALTER TABLE `violations`
   ADD CONSTRAINT `violations_ibfk_1` FOREIGN KEY (`resident_id`) REFERENCES `residents` (`id`) ON DELETE CASCADE;
