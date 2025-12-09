@@ -46,6 +46,10 @@
                 <li class="nav-item">
                     <a class="nav-link" href="checkin_list_all.php">簽到管理</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.php">儀表板</a>
+                </li>
+
             </ul>
         </div>
     </div>
