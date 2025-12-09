@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <div class="container mt-4">
-    <h2>新增簽到紀錄</h2>s
+    <h2>新增簽到紀錄</h2>
     <form method="POST">
         <div class="mb-3">
             <label for="resident_id" class="form-label">住民</label>

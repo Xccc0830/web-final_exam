@@ -2,35 +2,22 @@
 include("header.php");
 include("db.php");
 
-/* ===========================
-   1️⃣ KPI 數據
-   =========================== */
-
-// 目前住民數
 $total_residents = $conn->query("SELECT COUNT(*) AS total FROM residents")
                         ->fetch_assoc()['total'];
 
-// 設定每房 4 床（可自行更改）
 $beds_per_room = 4;
 
-// 查詢總房間數
 $total_rooms = $conn->query("SELECT COUNT(DISTINCT room) AS total FROM residents")
                     ->fetch_assoc()['total'];
 
-// 計算總床位
 $total_beds = $total_rooms * $beds_per_room;
 
-// 查詢今日簽到
 $today = date("Y-m-d");
 $sql_today = "SELECT COUNT(*) AS total FROM checkins WHERE DATE(checkin_time) = '$today'";
 $today_checkins = $conn->query($sql_today)->fetch_assoc()['total'];
 
-// 今日未簽到
 $today_not_check = $total_residents - $today_checkins;
 
-/* ===========================
-   2️⃣ 查詢各房號住民數量
-   =========================== */
 $sql_room = "SELECT room, COUNT(*) AS total FROM residents GROUP BY room ORDER BY room";
 $room_result = $conn->query($sql_room);
 
@@ -41,9 +28,6 @@ while ($row = $room_result->fetch_assoc()) {
     $room_totals[] = $row['total'];
 }
 
-/* ===========================
-   3️⃣ 違規種類統計
-   =========================== */
 $sql_violation = "SELECT violation, COUNT(*) AS total FROM violations GROUP BY violation";
 $vio_result = $conn->query($sql_violation);
 
@@ -54,9 +38,6 @@ while ($row = $vio_result->fetch_assoc()) {
     $vio_totals[] = $row['total'];
 }
 
-/* ===========================
-   4️⃣ 每日簽到折線圖
-   =========================== */
 $sql_checkin = "SELECT DATE(checkin_time) AS day, COUNT(*) AS total 
                 FROM checkins 
                 GROUP BY DATE(checkin_time) 
@@ -70,9 +51,6 @@ while ($row = $check_result->fetch_assoc()) {
     $check_totals[] = $row['total'];
 }
 
-/* ===========================
-   5️⃣ 今日簽到列表
-   =========================== */
 $today_result = $conn->query("
     SELECT c.checkin_time, r.name, r.room
     FROM checkins c
@@ -81,9 +59,6 @@ $today_result = $conn->query("
     ORDER BY c.checkin_time ASC
 ");
 
-/* ===========================
-   6️⃣ 違規超過 10 點者
-   =========================== */
 $danger_list = $conn->query("
     SELECT r.name, r.room, SUM(v.points) AS total_points
     FROM violations v
@@ -99,7 +74,7 @@ $danger_list = $conn->query("
     <h2>宿舍管理儀表板 Dashboard</h2>
     <hr>
 
-    <!-- 1️⃣ KPI 儀表板 -->
+
     <div class="row text-center mb-4">
 
         <div class="col-md-3">
@@ -132,7 +107,6 @@ $danger_list = $conn->query("
 
     </div>
 
-    <!-- 2️⃣ 異常提醒 -->
     <h4 class="text-danger">⚠ 異常提醒</h4>
     <ul>
         <?php if ($today_checkins == 0): ?>
@@ -150,7 +124,6 @@ $danger_list = $conn->query("
 
     <hr>
 
-    <!-- 3️⃣ 今日簽到列表 -->
     <h4>今日簽到名單</h4>
     <table class="table table-bordered table-striped">
         <thead>
@@ -177,7 +150,6 @@ $danger_list = $conn->query("
 
     <hr>
 
-    <!-- 4️⃣ 原本的三張圖表保留 -->
     <h4>各房號入住人數</h4>
     <canvas id="roomChart" height="150"></canvas>
     <hr>
@@ -191,7 +163,6 @@ $danger_list = $conn->query("
 </div>
 
 <script>
-// 房號入住
 new Chart(document.getElementById("roomChart"), {
     type: "bar",
     data: {
@@ -205,7 +176,6 @@ new Chart(document.getElementById("roomChart"), {
     options: { scales: { y: { beginAtZero: true } } }
 });
 
-// 違規
 new Chart(document.getElementById("vioChart"), {
     type: "pie",
     data: {
@@ -214,7 +184,6 @@ new Chart(document.getElementById("vioChart"), {
     }
 });
 
-// 每日簽到
 new Chart(document.getElementById("checkChart"), {
     type: "line",
     data: {
