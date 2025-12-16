@@ -1,5 +1,5 @@
 <?php
-// dashboard.php
+// dashboard.php - 修正 Admin/Student 視圖邏輯與 SQL 安全性
 
 // 確保 Session 已經啟動，以便檢查登入狀態
 if (session_status() === PHP_SESSION_NONE) {
@@ -8,39 +8,43 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // 引入 Header (包含 HTML 開頭標籤和導覽列)
 include("header.php"); 
-require_once 'db.php'; // 【關鍵修正】確保 $conn 在任何查詢前被定義
+require_once 'db.php'; 
 
-// 檢查使用者是否已登入 (住宿生)
+// 檢查使用者是否已登入
 $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === TRUE && isset($_SESSION['resident_id']);
+// 【關鍵修正】檢查是否為管理員
+$is_admin = $is_logged_in && isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 
-if ($is_logged_in) {
+
+// 判斷是否為「學生」登入，顯示個人視圖
+if ($is_logged_in && !$is_admin) {
     
     // =======================================================
-    // A. 住宿生個人紀錄視圖 (Resident View)
+    // A. 住宿生個人紀錄視圖 (Student Resident View)
     // =======================================================
     $current_resident_id = $_SESSION['resident_id'];
     $resident_name = htmlspecialchars($_SESSION['name']);
     
-    // 查詢住宿生房號
+    // 查詢住宿生房號 (已使用預備語句，安全)
     $room_query = $conn->prepare("SELECT room FROM residents WHERE id = ?");
     $room_query->bind_param("i", $current_resident_id);
     $room_query->execute();
     $resident_room = $room_query->get_result()->fetch_assoc()['room'];
     $room_query->close();
     
-    // 查詢違規紀錄
+    // 查詢違規紀錄 (已使用預備語句，安全)
     $violations_query = $conn->prepare("SELECT violation, points, created_at FROM violations WHERE resident_id = ? ORDER BY created_at DESC");
     $violations_query->bind_param("i", $current_resident_id);
     $violations_query->execute();
     $violations_result = $violations_query->get_result();
 
-    // 查詢點名/簽到紀錄
+    // 查詢點名/簽到紀錄 (已使用預備語句，安全)
     $checkins_query = $conn->prepare("SELECT checkin_time FROM checkins WHERE resident_id = ? ORDER BY checkin_time DESC");
     $checkins_query->bind_param("i", $current_resident_id);
     $checkins_query->execute();
     $checkins_result = $checkins_query->get_result();
 
-    // 總違規點數
+    // 總違規點數 (已使用預備語句，安全)
     $points_query = $conn->prepare("SELECT SUM(points) AS total_points FROM violations WHERE resident_id = ?");
     $points_query->bind_param("i", $current_resident_id);
     $points_query->execute();
@@ -117,23 +121,33 @@ if ($is_logged_in) {
     </div>
     <?php
 
-} else {
+// 判斷是否為「Admin」登入，顯示管理員儀表板
+} elseif ($is_admin) {
 
     // =======================================================
-    // B. 管理員儀表板視圖 (Admin View) - 您的原始程式碼
+    // B. 管理員儀表板視圖 (Admin View)
     // =======================================================
 
-    // 重新執行所有管理員統計查詢
+    // 重新執行所有管理員統計查詢 (已修正 SQL 注入)
     $total_residents = $conn->query("SELECT COUNT(*) AS total FROM residents")->fetch_assoc()['total'];
     $beds_per_room = 4;
     $total_rooms = $conn->query("SELECT COUNT(DISTINCT room) AS total FROM residents")->fetch_assoc()['total'];
-    $total_beds = $total_rooms * $beds_per_room;
+    // 假設您知道總房數或從資料庫取得，這裡保留您的計算邏輯
+    $total_beds = $total_rooms * $beds_per_room; 
 
     $today = date("Y-m-d");
-    $sql_today = "SELECT COUNT(*) AS total FROM checkins WHERE DATE(checkin_time) = '$today'";
-    $today_checkins = $conn->query($sql_today)->fetch_assoc()['total'];
-    $today_not_check = $total_residents - $today_checkins;
 
+    // ----------------------------------------------------
+    // 【關鍵修正】防止 SQL 注入：$today 不使用預備語句但已由 date() 函數淨化
+    // ----------------------------------------------------
+    $sql_today = $conn->prepare("SELECT COUNT(*) AS total FROM checkins WHERE DATE(checkin_time) = ?");
+    $sql_today->bind_param("s", $today);
+    $sql_today->execute();
+    $today_checkins = $sql_today->get_result()->fetch_assoc()['total'];
+    $sql_today->close();
+    $today_not_check = $total_residents - $today_checkins;
+    
+    // 查詢各房號入住人數 (安全)
     $sql_room = "SELECT room, COUNT(*) AS total FROM residents GROUP BY room ORDER BY room";
     $room_result = $conn->query($sql_room);
     $rooms = [];
@@ -143,6 +157,7 @@ if ($is_logged_in) {
         $room_totals[] = $row['total'];
     }
 
+    // 查詢違規紀錄統計 (安全)
     $sql_violation = "SELECT violation, COUNT(*) AS total FROM violations GROUP BY violation";
     $vio_result = $conn->query($sql_violation);
     $vio_labels = [];
@@ -152,6 +167,7 @@ if ($is_logged_in) {
         $vio_totals[] = $row['total'];
     }
 
+    // 查詢每日簽到次數 (安全)
     $sql_checkin = "SELECT DATE(checkin_time) AS day, COUNT(*) AS total 
                     FROM checkins 
                     GROUP BY DATE(checkin_time) 
@@ -164,14 +180,19 @@ if ($is_logged_in) {
         $check_totals[] = $row['total'];
     }
 
-    $today_result = $conn->query("
+    // 查詢今日簽到名單 (已修正 SQL 注入)
+    $today_query = $conn->prepare("
         SELECT c.checkin_time, r.name, r.room
         FROM checkins c
         JOIN residents r ON c.resident_id = r.id
-        WHERE DATE(c.checkin_time) = '$today'
+        WHERE DATE(c.checkin_time) = ?
         ORDER BY c.checkin_time ASC
     ");
+    $today_query->bind_param("s", $today);
+    $today_query->execute();
+    $today_result = $today_query->get_result();
 
+    // 查詢危險名單 (安全)
     $danger_list = $conn->query("
         SELECT r.name, r.room, SUM(v.points) AS total_points
         FROM violations v
@@ -182,9 +203,10 @@ if ($is_logged_in) {
     ?>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
 
     <div class="container mt-4">
-        <h2>宿舍管理儀表板 Dashboard</h2>
+        <h2>📊 宿舍管理儀表板 Dashboard</h2>
         <hr>
 
 
@@ -193,28 +215,28 @@ if ($is_logged_in) {
             <div class="col-md-3">
                 <div class="card p-3 bg-primary text-white">
                     <h4><?= $total_residents ?></h4>
-                    <p>目前入住</p>
+                    <p>目前入住總人數</p>
                 </div>
             </div>
 
             <div class="col-md-3">
                 <div class="card p-3 bg-success text-white">
                     <h4><?= $total_beds - $total_residents ?></h4>
-                    <p>空床位</p>
+                    <p>空床位數</p>
                 </div>
             </div>
 
             <div class="col-md-3">
                 <div class="card p-3 bg-info text-white">
                     <h4><?= $today_checkins ?></h4>
-                    <p>今日簽到</p>
+                    <p>今日已簽到人數</p>
                 </div>
             </div>
 
             <div class="col-md-3">
                 <div class="card p-3 bg-danger text-white">
                     <h4><?= $today_not_check ?></h4>
-                    <p>今日未簽到</p>
+                    <p>今日未簽到人數</p>
                 </div>
             </div>
 
@@ -222,15 +244,15 @@ if ($is_logged_in) {
 
         <h4 class="text-danger">⚠ 異常提醒</h4>
         <ul>
-            <?php if ($today_checkins == 0): ?>
+            <?php if ($today_checkins == 0 && $total_residents > 0): ?>
                 <li>⚠ 今天到目前為止無任何人簽到！</li>
             <?php endif; ?>
 
             <?php if ($danger_list->num_rows == 0): ?>
-                <li>未發現違規超過 10 點之住民。</li>
+                <li>未發現違規累積超過 10 點之住民。</li>
             <?php else: ?>
                 <?php while ($d = $danger_list->fetch_assoc()): ?>
-                    <li>⚠ <?= $d['name'] ?>（房號 <?= $d['room'] ?>）違規累積 <?= $d['total_points'] ?> 點</li>
+                    <li>⚠ <?= htmlspecialchars($d['name']) ?>（房號 <?= htmlspecialchars($d['room']) ?>）違規累積 **<?= htmlspecialchars($d['total_points']) ?> 點**</li>
                 <?php endwhile; ?>
             <?php endif; ?>
         </ul>
@@ -253,15 +275,17 @@ if ($is_logged_in) {
                     <?php else: ?>
                         <?php while ($t = $today_result->fetch_assoc()): ?>
                             <tr>
-                                <td><?= $t['name'] ?></td>
-                                <td><?= $t['room'] ?></td>
-                                <td><?= $t['checkin_time'] ?></td>
+                                <td><?= htmlspecialchars($t['name']) ?></td>
+                                <td><?= htmlspecialchars($t['room']) ?></td>
+                                <td><?= htmlspecialchars($t['checkin_time']) ?></td>
                             </tr>
                         <?php endwhile; ?>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
+        <?php $today_query->close(); ?>
+
         <hr>
 
         <h4>各房號入住人數</h4>
@@ -277,6 +301,7 @@ if ($is_logged_in) {
     </div>
 
     <script>
+    // Chart.js 程式碼 (保持不變)
     new Chart(document.getElementById("roomChart"), {
         type: "bar",
         data: {
@@ -317,6 +342,14 @@ if ($is_logged_in) {
     });
     </script>
     <?php 
+
+} else {
+    // =======================================================
+    // C. 未登入：導向登入頁面
+    // =======================================================
+    // 如果未登入且不是 Admin 身份，則導向登入頁面
+    header("location: login.php");
+    exit;
 } // End of else (Admin View)
 ?>
 
