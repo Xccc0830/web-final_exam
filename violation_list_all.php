@@ -1,5 +1,8 @@
 <?php
-include("db.php");   // 連線資料庫
+// violation_list_all.php (PDO 轉換版本)
+
+// 確保引入 PDO 連線 $pdo
+require_once("db.php"); 
 include("header.php"); // 頁首
 ?>
 
@@ -20,19 +23,31 @@ include("header.php"); // 頁首
     </thead>
     <tbody>
         <?php
-        // 修正 SQL，對應你的欄位
+        // 修正 SQL 語句
         $sql = "SELECT v.id AS violation_id, r.id AS resident_id, r.name, r.student_id, r.room, 
-                       v.violation, v.points, v.created_at
-                FROM violations v
-                JOIN residents r ON v.resident_id = r.id
-                ORDER BY r.name, v.id";
+                         v.violation, v.points, v.created_at
+                 FROM violations v
+                 JOIN residents r ON v.resident_id = r.id
+                 ORDER BY r.name, v.id";
 
-        $result = $conn->query($sql);
+        try {
+            // 1. 【PDO 修正】：使用 $pdo->query() 執行查詢
+            $stmt = $pdo->query($sql);
 
-        if ($result->num_rows == 0) {
+            // 2. 【PDO 修正】：使用 fetchAll() 獲取所有結果
+            $violations = $stmt->fetchAll(); 
+
+        } catch (PDOException $e) {
+            // 處理資料庫查詢錯誤
+            echo "<tr><td colspan='7' class='text-center text-danger'>資料庫查詢錯誤: " . $e->getMessage() . "</td></tr>";
+            $violations = []; // 設置為空陣列以避免後續錯誤
+        }
+
+        if (count($violations) == 0) {
             echo "<tr><td colspan='7' class='text-center'>目前沒有違規紀錄</td></tr>";
         } else {
-            while($row = $result->fetch_assoc()):
+            // 3. 【PDO 修正】：使用 foreach 迴圈遍歷陣列
+            foreach($violations as $row):
         ?>
         <tr>
             <td><?= htmlspecialchars($row['name']) ?></td>
@@ -47,7 +62,7 @@ include("header.php"); // 頁首
             </td>
         </tr>
         <?php
-            endwhile;
+            endforeach;
         }
         ?>
     </tbody>
@@ -55,4 +70,7 @@ include("header.php"); // 頁首
 
 <a href="violation_create.php" class="btn btn-success">＋ 新增違規紀錄</a>
 
-<?php include("footer.php"); ?>
+<?php 
+// 刪除 $result->close() 和 $conn->close() 等 mysqli 函數
+include("footer.php"); 
+?>

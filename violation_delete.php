@@ -1,15 +1,32 @@
 <?php
-include("db.php");
+// resident_delete.php (PDO 轉換版本)
+
+require_once("db.php");
+// 這裡可以加上 Admin 權限檢查
 
 $id = $_GET['id'] ?? 0;
-$resident_id = $_GET['resident_id'] ?? 0;
 
-$stmt = $conn->prepare("DELETE FROM violations WHERE id=?");
-$stmt->bind_param("i", $id);
+if (!$id || !is_numeric($id)) {
+    die("缺少住民 ID。");
+}
 
-if ($stmt->execute()) {
-    header("Location: violation_list_all.php");
-    exit;
-} else {
-    echo "刪除失敗: " . $stmt->error;
+try {
+    // 準備 DELETE 語句 (PDO 預備語句)
+    $stmt = $pdo->prepare("DELETE FROM residents WHERE id=?");
+    
+    // 執行並綁定參數
+    $stmt->execute([$id]);
+
+    if ($stmt->rowCount() > 0) {
+        // 刪除成功
+        header("Location: resident_list.php?msg=delete_success"); 
+        exit;
+    } else {
+        // ID 不存在
+        header("Location: resident_list.php?error=not_found");
+        exit;
+    }
+} catch (PDOException $e) {
+    // 資料庫錯誤 (例如外鍵約束：如果該住民有違規或簽到紀錄，則無法刪除)
+    die("刪除失敗: 資料庫錯誤: " . $e->getMessage());
 }

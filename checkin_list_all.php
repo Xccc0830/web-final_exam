@@ -1,6 +1,9 @@
 <?php
-include("db.php");       // 連線資料庫
-include("header.php");   // 頁首
+// checkin_list_all.php (PDO 轉換版本)
+
+// 確保引入 PDO 連線 $pdo
+require_once("db.php"); 
+include("header.php"); // 頁首
 ?>
 
 <div class="container mt-4">
@@ -24,12 +27,25 @@ include("header.php");   // 頁首
                     JOIN residents r ON c.resident_id = r.id
                     ORDER BY c.checkin_time DESC";
 
-            $result = $conn->query($sql);
+            try {
+                // 1. 【PDO 修正】：使用 $pdo->query() 執行查詢 (無使用者輸入，無需預備語句)
+                // 這是程式碼第 27 行的位置，將 $conn->query() 換成 $pdo->query()
+                $stmt = $pdo->query($sql); 
+                
+                // 2. 【PDO 修正】：使用 fetchAll() 獲取所有結果到陣列
+                $checkin_records = $stmt->fetchAll(); 
 
-            if ($result->num_rows == 0) {
+            } catch (PDOException $e) {
+                echo "<tr><td colspan='5' class='text-center text-danger'>資料庫查詢錯誤: " . $e->getMessage() . "</td></tr>";
+                $checkin_records = []; // 設置為空陣列
+            }
+
+            if (count($checkin_records) == 0) {
+                // 3. 【PDO 修正】：使用 count() 檢查結果數量
                 echo "<tr><td colspan='5' class='text-center'>目前沒有簽到紀錄</td></tr>";
             } else {
-                while($row = $result->fetch_assoc()):
+                // 4. 【PDO 修正】：使用 foreach 迴圈遍歷陣列
+                foreach($checkin_records as $row):
             ?>
             <tr>
                 <td><?= htmlspecialchars($row['name']) ?></td>
@@ -42,7 +58,7 @@ include("header.php");   // 頁首
                 </td>
             </tr>
             <?php
-                endwhile;
+                endforeach;
             }
             ?>
         </tbody>
