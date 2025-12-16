@@ -4,46 +4,35 @@
 require_once 'db.php'; // 現在引入的是 $pdo
 include("header.php");
 
-// -----------------------------------------------------------
-// 1. 身份組別檢查 (保持不變)
-// -----------------------------------------------------------
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     echo "<div class='container mt-4'><div class='alert alert-danger'>您沒有權限存取此頁面。</div></div>";
     include("footer.php");
     exit;
 }
 
-// -----------------------------------------------------------
-// 2. 搜尋功能：使用 PDO 預備語句
-// -----------------------------------------------------------
 $keyword = $_GET["keyword"] ?? "";
-$params = []; // 儲存參數
+$params = []; 
 
 $sql = "SELECT id, student_id, name, room, phone FROM residents";
 
 if (!empty($keyword)) {
-    // 使用命名參數 :kwd
     $sql .= " WHERE student_id LIKE :kwd 
               OR name LIKE :kwd
               OR room LIKE :kwd";
     
-    // 預備語句需要完整匹配的 LIKE 字串
     $search_term = "%" . $keyword . "%";
     
-    // 將參數設定為關聯陣列，名稱與 SQL 中的命名參數一致
     $params = [':kwd' => $search_term]; 
 }
 
-$sql .= " ORDER BY room, student_id"; // 保持排序
+$sql .= " ORDER BY room, student_id"; 
 
 try {
-    // 準備語句
     $stmt = $pdo->prepare($sql);
 
-    // 執行並傳入參數陣列 (如果 $params 為空，則執行無參數查詢)
     $stmt->execute($params); 
 
-    // 取得所有結果
     $residents = $stmt->fetchAll();
     
 } catch (PDOException $e) {
@@ -100,7 +89,4 @@ try {
     </div>
 </div>
 
-<?php
-// PDO 連線會在腳本結束時自動關閉，無需手動 $pdo->close()
-include("footer.php");
-?>
+<?phpinclude("footer.php");?>
