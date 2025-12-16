@@ -1,11 +1,11 @@
 <?php
-// resident_list.php - 修正 SQL 注入與新增權限保護
+// resident_list.php (PDO 轉換版本)
 
-require_once 'db.php';
+require_once 'db.php'; // 現在引入的是 $pdo
 include("header.php");
 
 // -----------------------------------------------------------
-// 1. 【關鍵修正】身份組別檢查：確保只有 Admin 才能訪問此頁面
+// 1. 身份組別檢查 (保持不變)
 // -----------------------------------------------------------
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     echo "<div class='container mt-4'><div class='alert alert-danger'>您沒有權限存取此頁面。</div></div>";
@@ -14,45 +14,41 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 }
 
 // -----------------------------------------------------------
-// 2. 【關鍵修正】搜尋功能：使用預備語句防止 SQL 注入
+// 2. 搜尋功能：使用 PDO 預備語句
 // -----------------------------------------------------------
 $keyword = $_GET["keyword"] ?? "";
-$params = [];
-$types = '';
+$params = []; // 儲存參數
 
 $sql = "SELECT id, student_id, name, room, phone FROM residents";
 
 if (!empty($keyword)) {
-    // 增加 WHERE 條件
-    $sql .= " WHERE student_id LIKE ? 
-              OR name LIKE ?
-              OR room LIKE ?";
+    // 使用命名參數 :kwd
+    $sql .= " WHERE student_id LIKE :kwd 
+              OR name LIKE :kwd
+              OR room LIKE :kwd";
     
     // 預備語句需要完整匹配的 LIKE 字串
     $search_term = "%" . $keyword . "%";
     
-    // 由於我們對三個欄位使用相同的關鍵字，將其重複加入參數陣列
-    $params = [$search_term, $search_term, $search_term];
-    $types = 'sss'; // 三個參數都是字串 (s)
+    // 將參數設定為關聯陣列，名稱與 SQL 中的命名參數一致
+    $params = [':kwd' => $search_term]; 
 }
 
 $sql .= " ORDER BY room, student_id"; // 保持排序
 
-// 準備語句
-$stmt = $conn->prepare($sql);
+try {
+    // 準備語句
+    $stmt = $pdo->prepare($sql);
 
-if ($stmt === false) {
-    die('Prepare failed: ' . htmlspecialchars($conn->error));
+    // 執行並傳入參數陣列 (如果 $params 為空，則執行無參數查詢)
+    $stmt->execute($params); 
+
+    // 取得所有結果
+    $residents = $stmt->fetchAll();
+    
+} catch (PDOException $e) {
+    die('Database query failed: ' . $e->getMessage());
 }
-
-// 綁定參數 (只有在有關鍵字時才綁定)
-if (!empty($keyword)) {
-    // 使用 call_user_func_array 處理動態參數數量
-    $stmt->bind_param($types, ...$params);
-}
-
-$stmt->execute();
-$result = $stmt->get_result();
 ?>
 
 <div class="container mt-4">
@@ -80,8 +76,8 @@ $result = $stmt->get_result();
                 </tr>
             </thead>
             <tbody>
-                <?php if ($result->num_rows > 0): ?>
-                    <?php while($row = $result->fetch_assoc()): ?>
+                <?php if (count($residents) > 0): ?>
+                    <?php foreach($residents as $row): ?>
                     <tr>
                         <td><?= htmlspecialchars($row["student_id"]) ?></td>
                         <td><?= htmlspecialchars($row["name"]) ?></td>
@@ -95,7 +91,7 @@ $result = $stmt->get_result();
                             <a href="checkin_list.php?resident_id=<?= $row['id'] ?>" class="btn btn-primary btn-sm">簽到紀錄</a>
                         </td>
                     </tr>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 <?php else: ?>
                     <tr><td colspan="5" class="text-center">未找到符合條件的住民資料。</td></tr>
                 <?php endif; ?>
@@ -105,8 +101,6 @@ $result = $stmt->get_result();
 </div>
 
 <?php
-// 關閉語句和連線
-$stmt->close(); 
-$conn->close(); // 【修正】確保資料庫連線被關閉
+// PDO 連線會在腳本結束時自動關閉，無需手動 $pdo->close()
 include("footer.php");
 ?>

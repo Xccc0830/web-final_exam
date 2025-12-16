@@ -1,58 +1,48 @@
 <?php
-// login_process.php - 已加入 role 欄位處理
+// login_process.php (PDO 轉換版本)
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+require_once 'db.php'; // 現在引入的是 PDO 連線 $pdo
 
-session_start();
-require_once 'db.php'; 
+$student_id = trim($_POST['student_id'] ?? '');
+$password = $_POST['password'] ?? '';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    $student_id = $conn->real_escape_string($_POST['student_id']);
-    $password = $conn->real_escape_string($_POST['password']); 
-    
-    // -----------------------------------------------------------------
-    // 關鍵調整：SELECT 中加入 role 欄位
-    // -----------------------------------------------------------------
-    $sql = "SELECT id, student_id, name, role FROM residents WHERE student_id = ? AND password = ?";
-    
-    $stmt = $conn->prepare($sql);
-    
-    if ($stmt === false) {
-        $_SESSION['login_error'] = '系統錯誤：無法準備查詢。';
-        header("location: login.php");
-        exit;
-    }
-    
-    $stmt->bind_param("ss", $student_id, $password);
-    $stmt->execute();
-    $result = $stmt->get_result();
+if (empty($student_id) || empty($password)) {
+    $_SESSION['login_error'] = "請輸入學號和密碼。";
+    header("location: login.php");
+    exit;
+}
 
-    if ($result->num_rows === 1) {
-        $resident = $result->fetch_assoc();
-        
-        // -----------------------------------------------------------------
-        // 關鍵調整：將 role 儲存到 Session
-        // -----------------------------------------------------------------
-        $_SESSION['role'] = $resident['role']; 
-        
-        // 登入成功
+try {
+    // 1. 準備語句：使用命名參數 :student_id
+    $stmt = $pdo->prepare("SELECT id, password, name, role FROM residents WHERE student_id = :student_id");
+    
+    // 2. 執行並傳入參數 (PDO 安全防範 SQL 注入)
+    $stmt->execute(['student_id' => $student_id]);
+    
+    // 3. 取得結果
+    $resident = $stmt->fetch();
+
+    if ($resident && password_verify($password, $resident['password'])) {
+        // 驗證成功，設定 Session
         $_SESSION['loggedin'] = TRUE;
-        $_SESSION['resident_id'] = $resident['id']; 
+        $_SESSION['resident_id'] = $resident['id'];
         $_SESSION['name'] = $resident['name'];
-        $_SESSION['student_id'] = $resident['student_id'];
+        $_SESSION['role'] = $resident['role'];
         
         header("location: dashboard.php");
-        exit; 
-            
+        exit;
     } else {
-        // 找不到匹配的學號和密碼組合 (錯誤)
-        $_SESSION['login_error'] = "登入失敗：學號或密碼錯誤。";
+        // 驗證失敗
+        $_SESSION['login_error'] = "學號或密碼錯誤。";
         $_SESSION['temp_student_id'] = $student_id;
         header("location: login.php");
         exit;
     }
 
-    $stmt->close();
+} catch (PDOException $e) {
+    // 處理資料庫錯誤
+    $_SESSION['login_error'] = "登入錯誤 (DB): " . $e->getMessage();
+    header("location: login.php");
+    exit;
 }
-
-$conn->close();
 ?>
