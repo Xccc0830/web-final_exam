@@ -1,13 +1,20 @@
 <?php
-// violation_list_all.php (修正路徑與顯示邏輯)
-
+// violation_list_all.php (超簡易搜尋版)
 require_once("db.php"); 
 include("header.php");
+
+// 1. 取得搜尋字 (k 代表 keyword)
+$k = $_GET['k'] ?? '';
 ?>
 
 <div class="container mt-4 mb-5">
     <h2 class="mb-4">違規管理（所有住民）</h2>
-    <p>顯示所有住民的違規紀錄及佐證資料。</p>
+
+    <form method="GET" class="mb-4">
+        <input type="text" name="k" placeholder="搜尋姓名或房號" value="<?= htmlspecialchars($k) ?>">
+        <button type="submit">搜尋</button>
+        <a href="violation_list_all.php">清除</a>
+    </form>
 
     <table class="table table-bordered table-striped align-middle">
         <thead class="table-dark">
@@ -24,23 +31,28 @@ include("header.php");
         </thead>
         <tbody>
             <?php
-            // 確保 SQL 有選取 evidence_path
+            // 2. 組合 SQL
             $sql = "SELECT v.id AS violation_id, r.name, r.student_id, r.room, 
                            v.violation, v.points, v.created_at, v.evidence_path
                     FROM violations v
-                    JOIN residents r ON v.resident_id = r.id
-                    ORDER BY v.created_at DESC";
+                    JOIN residents r ON v.resident_id = r.id";
 
-            try {
-                $stmt = $pdo->query($sql);
-                $violations = $stmt->fetchAll(); 
-            } catch (PDOException $e) {
-                echo "<tr><td colspan='8' class='text-center text-danger'>查詢錯誤: " . $e->getMessage() . "</td></tr>";
-                $violations = [];
+            if ($k !== '') {
+                $sql .= " WHERE r.name LIKE :k OR r.student_id LIKE :k OR r.room LIKE :k";
             }
+            $sql .= " ORDER BY v.created_at DESC";
+
+            // 3. 執行查詢
+            $stmt = $pdo->prepare($sql);
+            if ($k !== '') {
+                $stmt->execute(['k' => "%$k%"]);
+            } else {
+                $stmt->execute();
+            }
+            $violations = $stmt->fetchAll();
 
             if (count($violations) == 0) {
-                echo "<tr><td colspan='8' class='text-center'>目前沒有違規紀錄</td></tr>";
+                echo "<tr><td colspan='8' class='text-center'>找不到資料</td></tr>";
             } else {
                 foreach($violations as $row):
             ?>
@@ -51,45 +63,28 @@ include("header.php");
                 <td><?= htmlspecialchars($row['violation']) ?></td>
                 <td><span class="badge bg-danger">扣 <?= htmlspecialchars($row['points']) ?> 點</span></td>
                 <td><?= htmlspecialchars($row['created_at']) ?></td>
-                
                 <td class="text-center">
                     <?php if (!empty($row['evidence_path'])): ?>
-                        <?php 
-                        $file_ext = strtolower(pathinfo($row['evidence_path'], PATHINFO_EXTENSION));
-                        // 使用相對於根目錄的路徑，避免資料夾名稱不一致的問題
-                        $img_src = htmlspecialchars($row['evidence_path']);
-                        
-                        if (in_array($file_ext, ['jpg', 'jpeg', 'png', 'gif'])): 
-                        ?>
-                            <a href="<?= $img_src ?>" target="_blank">
-                                <img src="<?= $img_src ?>" alt="佐證圖" 
-                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;"
-                                     onerror="this.src='https://placehold.co/50?text=Error';">
-                            </a>
-                        <?php else: ?>
-                            <a href="<?= $img_src ?>" target="_blank" class="btn btn-sm btn-outline-info">
-                                <i class="bi bi-file-earmark-pdf">附件</i>
-                            </a>
-                        <?php endif; ?>
+                        <a href="<?= htmlspecialchars($row['evidence_path']) ?>" target="_blank">
+                            <img src="<?= htmlspecialchars($row['evidence_path']) ?>" 
+                                 style="width: 50px; height: 50px; object-fit: cover;"
+                                 onerror="this.src='https://placehold.co/50?text=Error';">
+                        </a>
                     <?php else: ?>
                         <span class="text-muted small">無檔案</span>
                     <?php endif; ?>
                 </td>
-
                 <td>
-                    <a href="violation_delete.php?id=<?= $row['violation_id'] ?>" class="btn btn-danger btn-sm"
-                       onclick="return confirm('確定要刪除這筆紀錄？');">刪除</a>
+                    <a href="violation_delete.php?id=<?= $row['violation_id'] ?>" 
+                       class="btn btn-danger btn-sm" onclick="return confirm('確定刪除？');">刪除</a>
                 </td>
             </tr>
-            <?php
-                endforeach;
-            }
-            ?>
+            <?php endforeach; } ?>
         </tbody>
     </table>
 
     <div class="mt-3">
-        <a href="violation_create.php" class="btn btn-success shadow-sm">＋ 新增違規紀錄</a>
+        <a href="violation_create.php" class="btn btn-success">＋ 新增違規紀錄</a>
     </div>
 </div>
 
