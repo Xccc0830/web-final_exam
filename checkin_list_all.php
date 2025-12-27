@@ -1,17 +1,26 @@
 <?php
-// checkin_list_all.php (PDO 轉換版本)
+// checkin_list_all.php (PDO 轉換版本 - 已將按鈕移至上方)
 
 // 確保引入 PDO 連線 $pdo
 require_once("db.php"); 
 include("header.php"); // 頁首
 ?>
 
-<div class="container mt-4">
-    <h2>簽到管理（所有住民）</h2>
-    <p>顯示所有住民的簽到紀錄。</p>
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">簽到管理（所有住民）</h2>
+            <p class="text-muted mb-0">顯示所有住民的簽到紀錄。</p>
+        </div>
+        <div>
+            <a href="checkin_create.php" class="btn btn-success shadow-sm">
+                <i class="bi bi-plus-lg"></i> ＋ 新增簽到紀錄
+            </a>
+        </div>
+    </div>
 
-    <table class="table table-bordered table-striped">
-        <thead>
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark">
             <tr>
                 <th>住民姓名</th>
                 <th>學號</th>
@@ -28,23 +37,17 @@ include("header.php"); // 頁首
                     ORDER BY c.checkin_time DESC";
 
             try {
-                // 1. 【PDO 修正】：使用 $pdo->query() 執行查詢 (無使用者輸入，無需預備語句)
-                // 這是程式碼第 27 行的位置，將 $conn->query() 換成 $pdo->query()
                 $stmt = $pdo->query($sql); 
-                
-                // 2. 【PDO 修正】：使用 fetchAll() 獲取所有結果到陣列
                 $checkin_records = $stmt->fetchAll(); 
 
             } catch (PDOException $e) {
                 echo "<tr><td colspan='5' class='text-center text-danger'>資料庫查詢錯誤: " . $e->getMessage() . "</td></tr>";
-                $checkin_records = []; // 設置為空陣列
+                $checkin_records = [];
             }
 
             if (count($checkin_records) == 0) {
-                // 3. 【PDO 修正】：使用 count() 檢查結果數量
                 echo "<tr><td colspan='5' class='text-center'>目前沒有簽到紀錄</td></tr>";
             } else {
-                // 4. 【PDO 修正】：使用 foreach 迴圈遍歷陣列
                 foreach($checkin_records as $row):
             ?>
             <tr>
@@ -63,10 +66,6 @@ include("header.php"); // 頁首
             ?>
         </tbody>
     </table>
-
-    <a href="checkin_create.php" class="btn btn-success">新增簽到紀錄</a>
 </div>
 
-<?php
-include("footer.php"); // 頁尾
-?>
+<?php include("footer.php"); ?>
