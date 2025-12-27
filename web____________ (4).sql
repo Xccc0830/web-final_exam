@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- 主機: 127.0.0.1
--- 產生時間： 
--- 伺服器版本: 10.1.22-MariaDB
--- PHP 版本： 7.1.4
+-- 主機： 127.0.0.1
+-- 產生時間： 2025-12-27 16:42:00
+-- 伺服器版本： 10.4.32-MariaDB
+-- PHP 版本： 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -31,11 +30,11 @@ SET time_zone = "+00:00";
 CREATE TABLE `checkins` (
   `id` int(11) NOT NULL,
   `resident_id` int(11) NOT NULL,
-  `checkin_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `checkin_time` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 資料表的匯出資料 `checkins`
+-- 傾印資料表的資料 `checkins`
 --
 
 INSERT INTO `checkins` (`id`, `resident_id`, `checkin_time`) VALUES
@@ -62,7 +61,8 @@ INSERT INTO `checkins` (`id`, `resident_id`, `checkin_time`) VALUES
 (23, 8, '2025-12-16 07:04:24'),
 (24, 3, '2025-12-16 07:04:25'),
 (25, 10, '2025-12-16 07:04:27'),
-(26, 7, '2025-12-16 07:04:29');
+(26, 7, '2025-12-16 07:04:29'),
+(27, 8, '2025-12-27 15:27:07');
 
 -- --------------------------------------------------------
 
@@ -78,11 +78,11 @@ CREATE TABLE `residents` (
   `role` varchar(10) NOT NULL DEFAULT 'student',
   `room` varchar(20) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 資料表的匯出資料 `residents`
+-- 傾印資料表的資料 `residents`
 --
 
 INSERT INTO `residents` (`id`, `student_id`, `password`, `name`, `role`, `room`, `phone`, `created_at`) VALUES
@@ -108,19 +108,19 @@ CREATE TABLE `violations` (
   `resident_id` int(11) NOT NULL,
   `violation` varchar(255) NOT NULL,
   `points` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `evidence_path` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 資料表的匯出資料 `violations`
+-- 傾印資料表的資料 `violations`
 --
 
 INSERT INTO `violations` (`id`, `resident_id`, `violation`, `points`, `created_at`, `evidence_path`) VALUES
-(36, 2, '宿舍燒起來', 50, '2025-12-16 07:03:53', 'uploads/violations/1765868633_69410459114b9.jpg');
+(38, 2, '測試', 1, '2025-12-27 15:35:18', 'uploads/violations/1766849718_694ffcb602bf5.jpg');
 
 --
--- 已匯出資料表的索引
+-- 已傾印資料表的索引
 --
 
 --
@@ -144,36 +144,39 @@ ALTER TABLE `violations`
   ADD KEY `resident_id` (`resident_id`);
 
 --
--- 在匯出的資料表使用 AUTO_INCREMENT
+-- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
 --
 
 --
--- 使用資料表 AUTO_INCREMENT `checkins`
+-- 使用資料表自動遞增(AUTO_INCREMENT) `checkins`
 --
 ALTER TABLE `checkins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
 --
--- 使用資料表 AUTO_INCREMENT `residents`
+-- 使用資料表自動遞增(AUTO_INCREMENT) `residents`
 --
 ALTER TABLE `residents`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
 --
--- 使用資料表 AUTO_INCREMENT `violations`
+-- 使用資料表自動遞增(AUTO_INCREMENT) `violations`
 --
 ALTER TABLE `violations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+
 --
--- 已匯出資料表的限制(Constraint)
+-- 已傾印資料表的限制式
 --
 
 --
--- 資料表的 Constraints `checkins`
+-- 資料表的限制式 `checkins`
 --
 ALTER TABLE `checkins`
   ADD CONSTRAINT `checkins_ibfk_1` FOREIGN KEY (`resident_id`) REFERENCES `residents` (`id`) ON DELETE CASCADE;
 
 --
--- 資料表的 Constraints `violations`
+-- 資料表的限制式 `violations`
 --
 ALTER TABLE `violations`
   ADD CONSTRAINT `violations_ibfk_1` FOREIGN KEY (`resident_id`) REFERENCES `residents` (`id`) ON DELETE CASCADE;
