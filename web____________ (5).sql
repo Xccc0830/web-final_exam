@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2025-12-27 16:42:00
+-- 產生時間： 2025-12-28 20:10:19
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -62,7 +62,16 @@ INSERT INTO `checkins` (`id`, `resident_id`, `checkin_time`) VALUES
 (24, 3, '2025-12-16 07:04:25'),
 (25, 10, '2025-12-16 07:04:27'),
 (26, 7, '2025-12-16 07:04:29'),
-(27, 8, '2025-12-27 15:27:07');
+(27, 8, '2025-12-27 15:27:07'),
+(28, 8, '2025-12-28 19:09:30'),
+(29, 4, '2025-12-28 19:09:31'),
+(30, 2, '2025-12-28 19:09:33'),
+(31, 5, '2025-12-28 19:09:35'),
+(32, 3, '2025-12-28 19:09:37'),
+(33, 7, '2025-12-28 19:09:39'),
+(34, 10, '2025-12-28 19:09:40'),
+(35, 1, '2025-12-28 19:09:44'),
+(36, 6, '2025-12-28 19:09:46');
 
 -- --------------------------------------------------------
 
@@ -117,7 +126,8 @@ CREATE TABLE `violations` (
 --
 
 INSERT INTO `violations` (`id`, `resident_id`, `violation`, `points`, `created_at`, `evidence_path`) VALUES
-(38, 2, '測試', 1, '2025-12-27 15:35:18', 'uploads/violations/1766849718_694ffcb602bf5.jpg');
+(38, 2, '測試', 1, '2025-12-27 15:35:18', 'uploads/violations/1766849718_694ffcb602bf5.jpg'),
+(39, 1, '騎車太帥', 999, '2025-12-28 19:08:19', 'uploads/violations/1766948899_6951802364ded.png');
 
 --
 -- 已傾印資料表的索引
@@ -151,19 +161,19 @@ ALTER TABLE `violations`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `checkins`
 --
 ALTER TABLE `checkins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `residents`
 --
 ALTER TABLE `residents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `violations`
 --
 ALTER TABLE `violations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- 已傾印資料表的限制式
