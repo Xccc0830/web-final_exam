@@ -1,7 +1,6 @@
 <?php
-// resident_list.php (PDO 轉換版本)
 
-require_once 'db.php'; // 現在引入的是 $pdo
+require_once 'db.php'; 
 include("header.php");
 
 
