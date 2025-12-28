@@ -89,4 +89,4 @@ try {
     </div>
 </div>
 
-<?phpinclude("footer.php");?>
+<?php include("footer.php");?>
