@@ -72,7 +72,7 @@ $is_admin = $is_logged_in && isset($_SESSION['role']) && $_SESSION['role'] === '
             <ul class="navbar-nav">
                 <?php if ($is_logged_in): ?>
                     <span class="navbar-text welcome-text">
-                        歡迎，**<?php echo $resident_name; ?>**
+                        歡迎，<?php echo $resident_name; ?>
                         <?php if ($is_admin): ?>
                             (管理員)
                         <?php endif; ?>
