@@ -16,16 +16,16 @@ $params = [];
 $sql = "SELECT id, student_id, name, room, phone FROM residents";
 
 if (!empty($keyword)) {
-    $sql .= " WHERE student_id LIKE :kwd 
-              OR name LIKE :kwd
-              OR room LIKE :kwd";
+    $sql .= " WHERE student_id LIKE :k1 
+              OR name LIKE :k2
+              OR room LIKE :k3";
     
     $search_term = "%" . $keyword . "%";
-    
-    $params = [':kwd' => $search_term]; 
+
+    $params = [':k1' => $search_term, ':k2' => $search_term, ':k3' => $search_term]; 
 }
 
-$sql .= " ORDER BY room, student_id"; 
+$sql .= " ORDER BY room  , student_id"; 
 
 try {
     $stmt = $pdo->prepare($sql);

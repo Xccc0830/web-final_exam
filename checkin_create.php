@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         if (!empty($scanned_student_id)) {
-            // 1. 透過學號查找 resident_id (PDO 預備語句)
+            // 1. 透過學號查找 resident_id 
             $stmt_find = $pdo->prepare("SELECT id, name FROM residents WHERE student_id = ?");
             $stmt_find->execute([$scanned_student_id]);
             $resident = $stmt_find->fetch();

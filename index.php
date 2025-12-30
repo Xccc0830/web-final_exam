@@ -1,6 +1,5 @@
 <?php
-// index.php
-// 不需要登入系統，所以不用 session_start()
+
 ?>
 
 <?php include("header.php"); ?>

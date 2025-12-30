@@ -34,7 +34,7 @@ include("header.php"); // 頁首
             $sql = "SELECT c.id AS checkin_id, r.name, r.student_id, r.room, c.checkin_time
                     FROM checkins c
                     JOIN residents r ON c.resident_id = r.id
-                    ORDER BY c.checkin_time DESC";
+                    ORDER BY r.room ASC";
 
             try {
                 $stmt = $pdo->query($sql); 
